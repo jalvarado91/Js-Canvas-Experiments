@@ -1,3 +1,5 @@
+"use strict";
+
 var canvas = document.querySelector('canvas');
 var ctx = canvas.getContext('2d');
 
@@ -6,11 +8,9 @@ canvas.width = window.innerWidth;
 
 var particleNum = 20000;
 var emissionRate = 5;
-var emitters = [ new Emitter(new Vector(canvas.width/2,canvas.height/2), new Vector(0, 2), Math.PI/4 ) ];
+var particleSize = 1;
+var objectSize = 3; // drawSize of emitter/field
 
-
-var particleSize = 2;
-var particles = [];
 
 /* Vector Class
  ********************/
@@ -60,6 +60,19 @@ Particle.prototype.draw = function() {
   ctx.fillRect(this.position.x, this.position.y, particleSize, particleSize);
 };
 
+Particle.prototype.calculateForces = function() {
+  var totalAccelerationX = 0;
+  var totalAccelerationY = 0;
+
+  for (var i = 0; i < fields.length; i++) {
+    var field = fields[i];
+    
+    
+    
+  };
+
+  this.acceleration = new Vector(totalAccelerationX, totalAccelerationY)
+};
 /* Emitter Class
  ********************/
 function Emitter (point, velocity, spread) {
@@ -79,6 +92,17 @@ Emitter.prototype.emitParticle = function() {
   return new Particle(position, velocity);
 };
 
+/* Field Class
+ ********************/
+function Field(point, mass) {
+  this.position = point;
+  this.setMass(mass);
+}
+
+Field.prototype.setMass = function(mass) {
+  this.mass = mass || 100;
+  this.drawColor = mass < 0 ? "#f00" : "#0f0";
+}
 
 
 /* Updating Functions
@@ -108,6 +132,8 @@ function plotParticles (boundsX, boundsY) {
 
     if(x < 0 || x > boundsX || y < 0 || y > boundsY) continue;
 
+    // Calculate the forces that will affect acceleration and therefore velocity before moving particle
+    particle.calculateForces();
     particle.move();
 
     // add this particle to current particles
@@ -118,7 +144,6 @@ function plotParticles (boundsX, boundsY) {
   particles = currentParticles;
 }
 
-
 /* Drawing Functions
  ********************/
 function drawParticles () {
@@ -127,7 +152,26 @@ function drawParticles () {
   };
 }
 
+/* Misc Utilities */
+function drawCircle(object) {
+  ctx.fillStyle = object.drawColor;
+  ctx.beginPath();
+  ctx.arc(object.position.x, object.position.y, objectSize, 0, Math.PI * 2);
+  ctx.closePath();
+  ctx.fill();
+}
 
+
+/* Variables that use classes defined 
+ * above placed here due to hoisting 
+ *************************************/
+var emitters = [ new Emitter(new Vector(canvas.width/2,canvas.height/2), new Vector(0, -1), Math.PI/4 ) ];
+
+var fields = [new Field(new Vector(canvas.width/4, canvas.height/2), -140)];
+
+var particles = [];
+
+/* Loop Sequence */ 
 function loop() {
   clear();
   update();
@@ -146,6 +190,8 @@ function update() {
 
 function draw() {
   drawParticles();
+  fields.forEach(drawCircle);
+  emitters.forEach(drawCircle);
 }
 
 function queue() {
