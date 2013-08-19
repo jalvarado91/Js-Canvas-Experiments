@@ -178,11 +178,14 @@ function drawCircle(object) {
  *************************************/
 var particles = [];
 
-var emitters = [ new Emitter(new Vector(midX - 150, midY), Vector.fromAngle(6, 2), Math.PI)];
-
-var fields = [new Field(new Vector(midX - 100, midY + 20), 150),
-              new Field(new Vector(midX - 300, midY + 20), 100),
-              new Field(new Vector(midX - 200, midY + 20), -20)];
+var emitters = [
+  new Emitter(new Vector(midX - 150, midY), Vector.fromAngle(6, 2), Math.PI)
+];
+ 
+var fields = [
+  new Field(new Vector(midX - 300, midY + 20), 900),
+  new Field(new Vector(midX - 200, midY + 10), -50),
+];
 
 
 /* Loop Sequence */ 
