@@ -4,8 +4,13 @@ var ctx = canvas.getContext('2d');
 canvas.height = window.innerHeight;
 canvas.width = window.innerWidth;
 
-var particleSize = 1;
-var particles = [ new Particle( new Vector(canvas.height/2, canvas.height/2), new Vector(1, 1), new Vector(0,.5) ) ];
+var particleNum = 2000;
+var emissionRate = 4;
+var emitters = [ new Emitter(new Vector(canvas.width/2,canvas.height/2), new Vector(0, 1), Math.PI/12 ) ];
+
+
+var particleSize = 2;
+var particles = [];
 
 /* Vector Class
  ********************/
@@ -50,12 +55,46 @@ Particle.prototype.move = function() {
 };
 
 Particle.prototype.draw = function() {
-  ctx.fillStyle = "rgb(0, 0, 255)";
-  ctx.fillRect(this.position.x, this.position.y, particleSize, particleSize)
+  ctx.fillStyle = 'rgb(0, 0, 255)';
+  ctx.fillRect(this.position.x, this.position.y, particleSize, particleSize);
 };
 
-/* Updating Calls
+/* Emitter Class
  ********************/
+function Emitter (point, velocity, spread) {
+  this.position = point; // Vector
+  this.velocity = velocity; // Vector
+  this.spread = spread || Math.PI / 32;
+  this.drawColor = "#999";
+}
+
+Emitter.prototype.emitParticle = function() {
+  var position = new Vector(this.position.x, this.position.y)
+  var magnitute = this.velocity.getMagnitude();
+  var angle = this.velocity.getAngle() + this.spread - (Math.random()*this.spread*2);
+
+  var velocity = Vector.fromAngle(angle, magnitute)
+
+  return new Particle(position, velocity);
+};
+
+
+
+/* Updating Functions
+ ********************/
+
+function addParticles () {
+  if (particles.length > particleNum) {return};
+
+  for (var i = 0; i < emitters.length; i++) {
+
+    for (var j = 0; j < emissionRate; j++) {
+      particles.push(emitters[i].emitParticle());
+    };
+
+  };
+}
+
 function plotParticles () {
   for (var i = 0; i < particles.length; i++) {
     particles[i].move();
@@ -63,7 +102,7 @@ function plotParticles () {
 }
 
 
-/* Drawing Calls
+/* Drawing Functions
  ********************/
 function drawParticles () {
   for (var i = 0; i < particles.length; i++) {
@@ -84,6 +123,7 @@ function clear() {
 }
 
 function update() {
+  addParticles();
   plotParticles();
 }
 
