@@ -4,9 +4,9 @@ var ctx = canvas.getContext('2d');
 canvas.height = window.innerHeight;
 canvas.width = window.innerWidth;
 
-var particleNum = 2000;
-var emissionRate = 4;
-var emitters = [ new Emitter(new Vector(canvas.width/2,canvas.height/2), new Vector(0, 1), Math.PI/12 ) ];
+var particleNum = 20000;
+var emissionRate = 5;
+var emitters = [ new Emitter(new Vector(canvas.width/2,canvas.height/2), new Vector(0, 2), Math.PI/4 ) ];
 
 
 var particleSize = 2;
@@ -44,6 +44,7 @@ function Particle (point, velocity, acceleration) {
   this.position = point || new Vector(0,0);
   this.velocity = velocity || new Vector(0,0);
   this.acceleration = acceleration || new Vector(0,0);
+  this.color = 'rgb(0, 0, 255)';
 }
 
 Particle.prototype.move = function() {
@@ -55,7 +56,7 @@ Particle.prototype.move = function() {
 };
 
 Particle.prototype.draw = function() {
-  ctx.fillStyle = 'rgb(0, 0, 255)';
+  ctx.fillStyle = this.color;
   ctx.fillRect(this.position.x, this.position.y, particleSize, particleSize);
 };
 
@@ -95,10 +96,26 @@ function addParticles () {
   };
 }
 
-function plotParticles () {
+function plotParticles (boundsX, boundsY) {
+  // Hold particles within bounds
+  var currentParticles = [];
+
   for (var i = 0; i < particles.length; i++) {
-    particles[i].move();
+    var particle = particles[i];
+    
+    var x = particle.position.x;
+    var y = particle.position.y;
+
+    if(x < 0 || x > boundsX || y < 0 || y > boundsY) continue;
+
+    particle.move();
+
+    // add this particle to current particles
+    currentParticles.push(particle);
   }
+
+  // Update global particles
+  particles = currentParticles;
 }
 
 
@@ -124,7 +141,7 @@ function clear() {
 
 function update() {
   addParticles();
-  plotParticles();
+  plotParticles(canvas.width, canvas.height);
 }
 
 function draw() {
