@@ -6,10 +6,14 @@ var ctx = canvas.getContext('2d');
 canvas.height = window.innerHeight;
 canvas.width = window.innerWidth;
 
+var midX = canvas.width/2;
+var midY = canvas.height/2;
+
 var particleNum = 20000;
 var emissionRate = 5;
-var particleSize = 1;
+var particleSize = 1.5;
 var objectSize = 3; // drawSize of emitter/field
+var bigG = 1;
 
 
 /* Vector Class
@@ -30,7 +34,7 @@ Vector.prototype.getMagnitude = function() {
 };
 
 Vector.prototype.getAngle = function() {
-  return Math.atan2(this.x, this.y);
+  return Math.atan2(this.y, this.x);
 };
 
 Vector.fromAngle = function(angle, magnitute) {
@@ -46,6 +50,24 @@ function Particle (point, velocity, acceleration) {
   this.acceleration = acceleration || new Vector(0,0);
   this.color = 'rgb(0, 0, 255)';
 }
+Particle.prototype.calculateForces = function(fields) {
+  var totalAccelerationX = 0;
+  var totalAccelerationY = 0;
+
+  for (var i = 0; i < fields.length; i++) {
+    var field = fields[i];
+    
+    var diff_x = field.position.x - this.position.x;
+    var diff_y = field.position.y - this.position.y;
+
+    var force = bigG*field.mass/Math.pow( diff_x*diff_x + diff_y*diff_y , 1.5); 
+
+    totalAccelerationX += diff_x*force;
+    totalAccelerationY += diff_y*force;
+  };
+
+  this.acceleration = new Vector(totalAccelerationX, totalAccelerationY);
+};
 
 Particle.prototype.move = function() {
   //Add current acceleration to current velocity
@@ -60,19 +82,7 @@ Particle.prototype.draw = function() {
   ctx.fillRect(this.position.x, this.position.y, particleSize, particleSize);
 };
 
-Particle.prototype.calculateForces = function() {
-  var totalAccelerationX = 0;
-  var totalAccelerationY = 0;
 
-  for (var i = 0; i < fields.length; i++) {
-    var field = fields[i];
-    
-    
-    
-  };
-
-  this.acceleration = new Vector(totalAccelerationX, totalAccelerationY)
-};
 /* Emitter Class
  ********************/
 function Emitter (point, velocity, spread) {
@@ -83,9 +93,10 @@ function Emitter (point, velocity, spread) {
 }
 
 Emitter.prototype.emitParticle = function() {
-  var position = new Vector(this.position.x, this.position.y)
-  var magnitute = this.velocity.getMagnitude();
   var angle = this.velocity.getAngle() + this.spread - (Math.random()*this.spread*2);
+
+  var magnitute = this.velocity.getMagnitude();
+  var position = new Vector(this.position.x, this.position.y)
 
   var velocity = Vector.fromAngle(angle, magnitute)
 
@@ -133,7 +144,7 @@ function plotParticles (boundsX, boundsY) {
     if(x < 0 || x > boundsX || y < 0 || y > boundsY) continue;
 
     // Calculate the forces that will affect acceleration and therefore velocity before moving particle
-    particle.calculateForces();
+    particle.calculateForces(fields);
     particle.move();
 
     // add this particle to current particles
@@ -165,11 +176,14 @@ function drawCircle(object) {
 /* Variables that use classes defined 
  * above placed here due to hoisting 
  *************************************/
-var emitters = [ new Emitter(new Vector(canvas.width/2,canvas.height/2), new Vector(0, -1), Math.PI/4 ) ];
-
-var fields = [new Field(new Vector(canvas.width/4, canvas.height/2), -140)];
-
 var particles = [];
+
+var emitters = [ new Emitter(new Vector(midX - 150, midY), Vector.fromAngle(6, 2), Math.PI)];
+
+var fields = [new Field(new Vector(midX - 100, midY + 20), 150),
+              new Field(new Vector(midX - 300, midY + 20), 100),
+              new Field(new Vector(midX - 200, midY + 20), -20)];
+
 
 /* Loop Sequence */ 
 function loop() {
