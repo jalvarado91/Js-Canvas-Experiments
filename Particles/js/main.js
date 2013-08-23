@@ -2,6 +2,11 @@
 
 var canvas = document.querySelector('canvas');
 var ctx = canvas.getContext('2d');
+var addFieldButton = document.getElementById('add-field');
+var removeLastButton = document.getElementById('remove-last');
+var clearButton = document.getElementById('clear-all');
+var colorsButton = document.getElementById('color-toggle');
+
 
 canvas.height = window.innerHeight;
 canvas.width = window.innerWidth;
@@ -10,11 +15,17 @@ var midX = canvas.width/2;
 var midY = canvas.height/2;
 
 var particleNum = 10000;
-var emissionRate = 6;
-var particleSize = 1.6;
+var emissionRate = 10;
+var particleSize = 1.7;
 var objectSize = 3; // drawSize of emitter/field
+var maxMass = 1500;
 var bigG = 1;
+var coloredParticles = false;
 
+addFieldButton.onclick = addField;
+removeLastButton.onclick = removeField;
+clearButton.onclick = clearFields;
+colorsButton.onclick = toggleColors;
 
 /* Vector Class
  ********************/
@@ -48,7 +59,14 @@ function Particle (point, velocity, acceleration) {
   this.position = point || new Vector(0,0);
   this.velocity = velocity || new Vector(0,0);
   this.acceleration = acceleration || new Vector(0,0);
-  this.color = 'rgb(0, 0, 255)';
+  //this.color = 'rgb(0, 0, 255)';
+  if (coloredParticles) {
+    this.color = 'rgb('+ Math.floor(Math.random()*256) +', '+
+                         Math.floor(Math.random()*256) +', '+
+                         Math.floor(Math.random()*256) +')';
+  }
+  else 
+    this.color = 'rgb(0, 0, 255)';
 }
 Particle.prototype.calculateForces = function(fields) {
   var totalAccelerationX = 0;
@@ -172,6 +190,36 @@ function drawCircle(object) {
   ctx.fill();
 }
 
+function addField() {
+  // new Field(position, mass);
+  var positionX = Math.random() * canvas.width;
+  var positionY = Math.random() * canvas.height;
+  var position = new Vector(positionX, positionY);
+  var mass = (Math.random() * maxMass*2) - maxMass;
+  var dwarf = new Field(position, mass);
+  
+  fields.push(dwarf);
+}
+
+function removeField() {
+  var lastField = fields.length - 1;
+  fields.splice(lastField, 1);
+}
+
+function clearFields() {
+  fields = [];
+}
+
+function toggleColors() {
+  if(coloredParticles) { 
+    coloredParticles = false;
+    colorsButton.innerHTML = "Colors!";
+  }
+  else {
+    coloredParticles = true;
+    colorsButton.innerHTML = "No Colors!";
+  }
+}
 
 /* Variables that use classes defined 
  * above placed here due to hoisting 
@@ -183,10 +231,11 @@ var emitters = [
 ];
  
 var fields = [
-  new Field(new Vector(midX - 300, midY + 20), 900),
-  new Field(new Vector(midX - 200, midY + 10), -50),
+  new Field(new Vector(midX - 450, midY + 20), 900),
+  new Field(new Vector(midX - 300, midY + 10), -90),
+  
+  new Field(new Vector(midX + 300, midY - 20), 1500),
   new Field(new Vector(midX + 200, midY - 10), -200),
-  new Field(new Vector(midX + 300, midY - 20), 1000)
 ];
 
 
