@@ -9,9 +9,9 @@ canvas.width = window.innerWidth;
 var midX = canvas.width/2;
 var midY = canvas.height/2;
 
-var particleNum = 20000;
-var emissionRate = 5;
-var particleSize = 1.5;
+var particleNum = 10000;
+var emissionRate = 6;
+var particleSize = 1.6;
 var objectSize = 3; // drawSize of emitter/field
 var bigG = 1;
 
@@ -185,6 +185,8 @@ var emitters = [
 var fields = [
   new Field(new Vector(midX - 300, midY + 20), 900),
   new Field(new Vector(midX - 200, midY + 10), -50),
+  new Field(new Vector(midX + 200, midY - 10), -200),
+  new Field(new Vector(midX + 300, midY - 20), 1000)
 ];
 
 
