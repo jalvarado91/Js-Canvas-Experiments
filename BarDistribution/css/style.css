@@ -2,6 +2,7 @@ body, html {
   margin: 0;
   padding: 0;
   position: relative;
+  overflow: hidden;
 }
 
 canvas {
@@ -17,36 +18,6 @@ button {
   top: 10px;
   left: 10px;
 }
-
-button#remove-last {
-  left: 120px;
-  background: #692a69;
-}
-
-button#remove-last:hover {
-  left: 120px;
-  background: #8a3f8a;
-}
-
-button#clear-all {
-  left: 315px;
-  background: #e83333;
-}
-
-button#clear-all:hover {
-  left: 315px;
-  background: #e65c5c;
-}
-
 button:hover {
   background: #34ba77;
-}
-
-button#color-toggle {
-  bottom: 10px;
-  top: auto;
-  background: #e6470e;
-}
-button#color-toggle:hover {
-  background: #e66a40;
 }

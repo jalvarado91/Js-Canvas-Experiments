@@ -2,18 +2,21 @@
 
 var canvas = document.querySelector('canvas');
 var ctx = canvas.getContext('2d');
+var reset = document.querySelector('button');
 
-canvas.height = window.innerHeight-5;
-canvas.width = window.innerWidth-5;
+reset.onclick = resetCounts;
 
-var midX = canvas.width/2;
-var midY = canvas.height/2;
+canvas.height = window.innerHeight;
+canvas.width = window.innerWidth;
 
 var numOfOutcomes = 20;
 var growthSpeed = 3;
 
+function resetCounts() {
+  randomCounts = countsArray(numOfOutcomes);
+}
 var randomInt = function(upperBound) {
-  return Math.floor(Math.random()*(upperBound+1));
+  return (Math.floor(Math.random()*upperBound));
 }
 var countsArray = function(numOfOutcomes) {
   var counts = new Array(numOfOutcomes);
